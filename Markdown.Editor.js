@@ -8,7 +8,7 @@
         doc = window.document,
         re = window.RegExp,
         nav = window.navigator,
-        SETTINGS = { lineLength: 72 },
+        SETTINGS = {lineLength: 72},
 
     // Used to work around some browser bugs where we can't use feature testing.
         uaSniffed = {
@@ -90,29 +90,34 @@
     // - run() actually starts the editor; should be called after all necessary plugins are registered. Calling this more than once is a no-op.
     // - refreshPreview() forces the preview to be updated. This method is only available after run() was called.
     Markdown.Editor = function (markdownConverter, idPostfix, options) {
-        
+
         options = options || {};
 
         if (typeof options.handler === "function") { //backwards compatible behavior
-            options = { helpButton: options };
+            options = {helpButton: options};
         }
         options.strings = options.strings || {};
         if (options.helpButton) {
             options.strings.help = options.strings.help || options.helpButton.title;
         }
-        var getString = function (identifier) { return options.strings[identifier] || defaultsStrings[identifier]; }
+        var getString = function (identifier) {
+            return options.strings[identifier] || defaultsStrings[identifier];
+        }
 
         idPostfix = idPostfix || "";
 
         var hooks = this.hooks = new Markdown.HookCollection();
         hooks.addNoop("onPreviewRefresh");       // called with no arguments after the preview has been refreshed
         hooks.addNoop("postBlockquoteCreation"); // called with the user's selection *after* the blockquote was created; should return the actual to-be-inserted text
-        hooks.addFalse("insertImageDialog");     /* called with one parameter: a callback to be called with the URL of the image. If the application creates
-                                                  * its own image insertion dialog, this hook should return true, and the callback should be called with the chosen
-                                                  * image url (or null if the user cancelled). If this hook returns false, the default dialog will be used.
-                                                  */
+        hooks.addFalse("insertImageDialog");
+        /* called with one parameter: a callback to be called with the URL of the image. If the application creates
+         * its own image insertion dialog, this hook should return true, and the callback should be called with the chosen
+         * image url (or null if the user cancelled). If this hook returns false, the default dialog will be used.
+         */
 
-        this.getConverter = function () { return markdownConverter; }
+        this.getConverter = function () {
+            return markdownConverter;
+        }
 
         var that = this,
             panels;
@@ -123,7 +128,9 @@
 
             panels = new PanelCollection(idPostfix);
             var commandManager = new CommandManager(hooks, getString, markdownConverter);
-            var previewManager = new PreviewManager(markdownConverter, panels, function () { hooks.onPreviewRefresh(); });
+            var previewManager = new PreviewManager(markdownConverter, panels, function () {
+                hooks.onPreviewRefresh();
+            });
             var undoManager, uiManager;
 
             if (!/\?noundo/.test(doc.location.href)) {
@@ -142,7 +149,9 @@
             uiManager = new UIManager(idPostfix, panels, undoManager, previewManager, commandManager, options.helpButton, getString);
             uiManager.setUndoRedoButtonStates();
 
-            var forceRefresh = that.refreshPreview = function () { previewManager.refresh(true); };
+            var forceRefresh = that.refreshPreview = function () {
+                previewManager.refresh(true);
+            };
 
             forceRefresh();
         };
@@ -151,7 +160,8 @@
 
     // before: contains all the text in the input box BEFORE the selection.
     // after: contains all the text in the input box AFTER the selection.
-    function Chunks() { }
+    function Chunks() {
+    }
 
     // startRegex: a regular expression to find the start tag
     // endRegex: a regular expresssion to find the end tag
@@ -208,8 +218,14 @@
         if (remove) {
             beforeReplacer = afterReplacer = "";
         } else {
-            beforeReplacer = function (s) { that.before += s; return ""; }
-            afterReplacer = function (s) { that.after = s + that.after; return ""; }
+            beforeReplacer = function (s) {
+                that.before += s;
+                return "";
+            }
+            afterReplacer = function (s) {
+                that.after = s + that.after;
+                return "";
+            }
         }
 
         this.selection = this.selection.replace(/^(\s*)/, beforeReplacer).replace(/(\s*)$/, afterReplacer);
@@ -847,14 +863,12 @@
             if (window.innerHeight) {
                 result = window.pageYOffset;
             }
-            else
-                if (doc.documentElement && doc.documentElement.scrollTop) {
-                    result = doc.documentElement.scrollTop;
-                }
-                else
-                    if (doc.body) {
-                        result = doc.body.scrollTop;
-                    }
+            else if (doc.documentElement && doc.documentElement.scrollTop) {
+                result = doc.documentElement.scrollTop;
+            }
+            else if (doc.body) {
+                result = doc.body.scrollTop;
+            }
 
             return result;
         };
@@ -1023,9 +1037,9 @@
 
         var background = doc.createElement("div"),
             style = background.style;
-        
+
         background.className = "wmd-prompt-background";
-        
+
         style.position = "absolute";
         style.top = "0";
 
@@ -1109,7 +1123,6 @@
         };
 
 
-
         // Create the text input box form/window.
         var createDialog = function () {
 
@@ -1130,7 +1143,9 @@
             // The web form container for the text box and buttons.
             var form = doc.createElement("form"),
                 style = form.style;
-            form.onsubmit = function () { return close(false); };
+            form.onsubmit = function () {
+                return close(false);
+            };
             style.padding = "0";
             style.margin = "0";
             style.cssFloat = "left";
@@ -1152,7 +1167,9 @@
             // The ok button
             var okButton = doc.createElement("input");
             okButton.type = "button";
-            okButton.onclick = function () { return close(false); };
+            okButton.onclick = function () {
+                return close(false);
+            };
             okButton.value = "OK";
             style = okButton.style;
             style.margin = "10px";
@@ -1163,7 +1180,9 @@
             // The cancel button
             var cancelButton = doc.createElement("input");
             cancelButton.type = "button";
-            cancelButton.onclick = function () { return close(true); };
+            cancelButton.onclick = function () {
+                return close(true);
+            };
             cancelButton.value = "Cancel";
             style = cancelButton.style;
             style.margin = "10px";
@@ -1383,48 +1402,27 @@
             var highlightYShift = "-40px";
             var image = button.getElementsByTagName("span")[0];
             if (isEnabled) {
-                image.style.backgroundPosition = button.XShift + " " + normalYShift;
-                button.onmouseover = function () {
-                    image.style.backgroundPosition = this.XShift + " " + highlightYShift;
-                };
-
-                button.onmouseout = function () {
-                    image.style.backgroundPosition = this.XShift + " " + normalYShift;
-                };
-
-                // IE tries to select the background image "button" text (it's
-                // implemented in a list item) so we have to cache the selection
-                // on mousedown.
-                if (uaSniffed.isIE) {
-                    button.onmousedown = function () {
-                        if (doc.activeElement && doc.activeElement !== panels.input) { // we're not even in the input box, so there's no selection
-                            return;
-                        }
-                        panels.ieCachedRange = document.selection.createRange();
-                        panels.ieCachedScrollTop = panels.input.scrollTop;
-                    };
-                }
-
+                image.style.color = "#000000";
                 if (!button.isHelp) {
                     button.onclick = function () {
-                        if (this.onmouseout) {
-                            this.onmouseout();
-                        }
                         doClick(this);
                         return false;
                     }
                 }
             }
             else {
-                image.style.backgroundPosition = button.XShift + " " + disabledYShift;
-                button.onmouseover = button.onmouseout = button.onclick = function () { };
+                image.style.color = "#c5c5c5";
+                button.onmouseover = button.onmouseout = button.onclick = function () {
+                };
             }
         }
 
         function bindCommand(method) {
             if (typeof method === "string")
                 method = commandManager[method];
-            return function () { method.apply(commandManager, arguments); }
+            return function () {
+                method.apply(commandManager, arguments);
+            }
         }
 
         function makeSpritedButtonRow() {
@@ -1440,12 +1438,13 @@
             buttonRow.className = 'wmd-button-row';
             buttonRow = buttonBar.appendChild(buttonRow);
             var xPosition = 0;
-            var makeButton = function (id, title, XShift, textOp) {
+            var makeButton = function (id, title, XShift, faClass, textOp) {
                 var button = document.createElement("li");
                 button.className = "wmd-button";
                 button.style.left = xPosition + "px";
                 xPosition += 25;
                 var buttonImage = document.createElement("span");
+                buttonImage.className = "fa " + faClass;
                 button.id = id + postfix;
                 button.appendChild(buttonImage);
                 button.title = title;
@@ -1464,36 +1463,40 @@
                 xPosition += 25;
             }
 
-            buttons.bold = makeButton("wmd-bold-button", getString("bold"), "0px", bindCommand("doBold"));
-            buttons.italic = makeButton("wmd-italic-button", getString("italic"), "-20px", bindCommand("doItalic"));
+            buttons.bold = makeButton("wmd-bold-button", getString("bold"), "0px", "fa-bold", bindCommand("doBold"));
+            buttons.italic = makeButton("wmd-italic-button", getString("italic"), "-20px", "fa-italic", bindCommand("doItalic"));
             makeSpacer(1);
-            buttons.link = makeButton("wmd-link-button", getString("link"), "-40px", bindCommand(function (chunk, postProcessing) {
+            buttons.link = makeButton("wmd-link-button", getString("link"), "-40px", "fa-link", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, false);
             }));
-            buttons.quote = makeButton("wmd-quote-button", getString("quote"), "-60px", bindCommand("doBlockquote"));
-            buttons.code = makeButton("wmd-code-button", getString("code"), "-80px", bindCommand("doCode"));
-            buttons.image = makeButton("wmd-image-button", getString("image"), "-100px", bindCommand(function (chunk, postProcessing) {
+            buttons.quote = makeButton("wmd-quote-button", getString("quote"), "-60px", "fa-quote-left", bindCommand("doBlockquote"));
+            buttons.code = makeButton("wmd-code-button", getString("code"), "-80px", "fa-code", bindCommand("doCode"));
+            buttons.image = makeButton("wmd-image-button", getString("image"), "-100px", "fa-image", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, true);
             }));
             makeSpacer(2);
-            buttons.olist = makeButton("wmd-olist-button", getString("olist"), "-120px", bindCommand(function (chunk, postProcessing) {
+            buttons.olist = makeButton("wmd-olist-button", getString("olist"), "-120px", "fa-list-ol", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, true);
             }));
-            buttons.ulist = makeButton("wmd-ulist-button", getString("ulist"), "-140px", bindCommand(function (chunk, postProcessing) {
+            buttons.ulist = makeButton("wmd-ulist-button", getString("ulist"), "-140px", "fa-list-ul", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, false);
             }));
-            buttons.heading = makeButton("wmd-heading-button", getString("heading"), "-160px", bindCommand("doHeading"));
-            buttons.hr = makeButton("wmd-hr-button", getString("hr"), "-180px", bindCommand("doHorizontalRule"));
+            buttons.heading = makeButton("wmd-heading-button", getString("heading"), "-160px", "fa-header", bindCommand("doHeading"));
+            buttons.hr = makeButton("wmd-hr-button", getString("hr"), "-180px", "fa-minus", bindCommand("doHorizontalRule"));
             makeSpacer(3);
-            buttons.undo = makeButton("wmd-undo-button", getString("undo"), "-200px", null);
-            buttons.undo.execute = function (manager) { if (manager) manager.undo(); };
+            buttons.undo = makeButton("wmd-undo-button", getString("undo"), "-200px", "fa-mail-reply", null);
+            buttons.undo.execute = function (manager) {
+                if (manager) manager.undo();
+            };
 
             var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
                 getString("redo") :
                 getString("redomac"); // mac and other non-Windows platforms
 
-            buttons.redo = makeButton("wmd-redo-button", redoTitle, "-220px", null);
-            buttons.redo.execute = function (manager) { if (manager) manager.redo(); };
+            buttons.redo = makeButton("wmd-redo-button", redoTitle, "-220px", "fa-mail-forward", null);
+            buttons.redo.execute = function (manager) {
+                if (manager) manager.redo();
+            };
 
             if (helpOptions) {
                 var helpButton = document.createElement("li");
@@ -1639,7 +1642,7 @@
 
         var defs = "";
         var regex = /(\[)((?:\[[^\]]*\]|[^\[\]])*)(\][ ]?(?:\n[ ]*)?\[)(\d+)(\])/g;
-        
+
         // The above regex, used to update [foo][13] references after renumbering,
         // is much too liberal; it can catch things that are not actually parsed
         // as references (notably: code). It's impossible to know which matches are
@@ -1653,7 +1656,7 @@
         var complete = chunk.before + chunk.selection + chunk.after;
         var rendered = this.converter.makeHtml(complete);
         var testlink = "http://this-is-a-real-link.biz/";
-        
+
         // If our fake link appears in the rendered version *before* we have added it,
         // this probably means you're a Meta Stack Exchange user who is deliberately
         // trying to break this feature. You can still break this workaround if you
@@ -1661,7 +1664,7 @@
         // that case, consider yourself unsupported.
         while (rendered.indexOf(testlink) != -1)
             testlink += "nicetry/";
-        
+
         var fakedefs = "\n\n";
 
         // the regex is tested on the (up to) three chunks separately, and on substrings,
@@ -1682,13 +1685,13 @@
             skippedChars -= offset;
             return result;
         });
-        
+
         rendered = this.converter.makeHtml(uniquified + fakedefs);
-        
-        var okayToModify = function(offset) {
+
+        var okayToModify = function (offset) {
             return rendered.indexOf(testlink + offset + "/unicorn") !== -1;
         }
-        
+
         var addDefNumber = function (def) {
             refNumber++;
             def = def.replace(/^[ ]{0,3}\[(\d+)\]:/, "  [" + refNumber + "]:");
@@ -1716,7 +1719,7 @@
         var len = chunk.before.length;
         chunk.before = chunk.before.replace(regex, getLink);
         skippedChars += len;
-        
+
         len = chunk.selection.length;
         if (linkDef) {
             addDefNumber(linkDef);
@@ -1724,7 +1727,7 @@
         else {
             chunk.selection = chunk.selection.replace(regex, getLink);
         }
-        skippedChars += len;        
+        skippedChars += len;
 
         var refOut = refNumber;
 
@@ -1746,7 +1749,7 @@
     // sure the URL and the optinal title are "nice".
     function properlyEncoded(linkdef) {
         return linkdef.replace(/^\s*(.*?)(?:\s+"(.+)")?\s*$/, function (wholematch, link, title) {
-            
+
             var inQueryString = false;
 
             // Having `[^\w\d-./]` in there is just a shortcut that lets us skip
@@ -1771,7 +1774,7 @@
                         inQueryString = true;
                         return "?";
                         break;
-                    
+
                     // In the query string, a plus and a space are identical -- normalize.
                     // Not strictly necessary, but identical behavior to the previous version
                     // of this function.
@@ -1782,7 +1785,7 @@
                 }
                 return encodeURI(match);
             })
-            
+
             if (title) {
                 title = title.trim ? title.trim() : title.replace(/^\s*/, "").replace(/\s*$/, "");
                 title = title.replace(/"/g, "quot;").replace(/\(/g, "&#40;").replace(/\)/g, "&#41;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -1805,7 +1808,7 @@
 
         }
         else {
-            
+
             // We're moving start and end tag back into the selection, since (as we're in the else block) we're not
             // *removing* a link, but *adding* one, so whatever findTags() found is now back to being part of the
             // link text. linkEnteredCallback takes care of escaping any brackets.
@@ -1843,7 +1846,7 @@
                     // would mean a zero-width match at the start. Since zero-width matches advance the string position,
                     // the first bracket could then not act as the "not a backslash" for the second.
                     chunk.selection = (" " + chunk.selection).replace(/([^\\](?:\\\\)*)(?=[[\]])/g, "$1\\").substr(1);
-                    
+
                     var linkDef = " [999]: " + properlyEncoded(link);
 
                     var num = that.addLinkDef(chunk, linkDef);
@@ -1885,7 +1888,7 @@
         chunk.before = chunk.before.replace(/(\n|^)[ ]{0,3}([*+-]|\d+[.])[ \t]*\n$/, "\n\n");
         chunk.before = chunk.before.replace(/(\n|^)[ ]{0,3}>[ \t]*\n$/, "\n\n");
         chunk.before = chunk.before.replace(/(\n|^)[ \t]+\n$/, "\n\n");
-        
+
         // There's no selection, end the cursor wasn't at the end of the line:
         // The user wants to split the current list item / code line / blockquote line
         // (for the latter it doesn't really matter) in two. Temporarily select the
@@ -1913,7 +1916,7 @@
                 commandMgr.doCode(chunk);
             }
         }
-        
+
         if (fakeSelection) {
             chunk.after = chunk.selection + chunk.after;
             chunk.selection = "";
@@ -1942,15 +1945,15 @@
         // text *directly before* the selection already was a blockquote:
 
         /*
-        if (chunk.before) {
-        chunk.before = chunk.before.replace(/\n?$/, "\n");
-        }
-        chunk.before = chunk.before.replace(/(((\n|^)(\n[ \t]*)*>(.+\n)*.*)+(\n[ \t]*)*$)/,
-        function (totalMatch) {
-        chunk.startTag = totalMatch;
-        return "";
-        });
-        */
+         if (chunk.before) {
+         chunk.before = chunk.before.replace(/\n?$/, "\n");
+         }
+         chunk.before = chunk.before.replace(/(((\n|^)(\n[ \t]*)*>(.+\n)*.*)+(\n[ \t]*)*$)/,
+         function (totalMatch) {
+         chunk.startTag = totalMatch;
+         return "";
+         });
+         */
 
         // This comes down to:
         // Go backwards as many lines a possible, such that each line
@@ -2057,10 +2060,10 @@
 
         if (!/\n/.test(chunk.selection)) {
             chunk.selection = chunk.selection.replace(/^(> *)/,
-            function (wholeMatch, blanks) {
-                chunk.startTag += blanks;
-                return "";
-            });
+                function (wholeMatch, blanks) {
+                    chunk.startTag += blanks;
+                    return "";
+                });
         }
     };
 
